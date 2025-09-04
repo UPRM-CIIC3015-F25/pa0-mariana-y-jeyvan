@@ -3,6 +3,7 @@ import pygame, sys, random
 pygame.mixer.init()
 sound = pygame.mixer.Sound("BOOM sound effect (1).mp3")
 
+highscore = 0
 
 def ball_movement():
     """
@@ -17,9 +18,9 @@ def ball_movement():
     # Start the ball movement when the game begins
     # TODO Task 5 Create a Merge Conflict
     speed = 7
-    if start:
+    if start and ball_speed_x == 0 and ball_speed_y == 0:
         ball_speed_x = speed * random.choice((1, -1))  # Randomize initial horizontal direction
-        ball_speed_y = speed * random.choice((1, -1))  # Randomize initial vertical direction
+        ball_speed_y = speed * random.choice((-1, -1))  # Randomize initial vertical direction
         start = False
 
     # Ball collision with the player paddle
@@ -28,19 +29,27 @@ def ball_movement():
             # TODO Task 2: Fix score to increase by 1
             score += 1  # Increase player score
             ball_speed_y *= -1  # Reverse ball's vertical direction
+            ball.bottom = player.top
             # TODO Task 6: Add sound effects HERE
         sound.play()
+
     # Ball collision with top boundary
     if ball.top <= 0:
         ball_speed_y *= -1  # Reverse ball's vertical direction
+        ball.top = 0
 
     # Ball collision with left and right boundaries
-    if ball.left <= 0 or ball.right >= screen_width:
+    if ball.left <= 0:
         ball_speed_x *= -1
+        ball.left = 0
+
+    if ball.right >= screen_width:
+        ball_speed_x *= -1
+        ball.right = screen_width
 
     # Ball goes below the bottom boundary (missed by player)
     if ball.bottom > screen_height:
-        restart()  # Reset the game
+        game_over_screen()  # Reset the game
 
 def player_movement():
     """
@@ -55,13 +64,49 @@ def player_movement():
         player.right = screen_width
 
 def restart():
-    """
-    Resets the ball and player scores to the initial state.
-    """
-    global ball_speed_x, ball_speed_y, score
-    ball.center = (screen_width / 2, screen_height / 2)  # Reset ball position to center
-    ball_speed_y, ball_speed_x = 0, 0  # Stop ball movement
-    score = 0  # Reset player score
+    global ball_speed_x, ball_speed_y, score, start, player_speed
+    ball.center = (screen_width / 2, screen_height / 2)
+    ball_speed_x, ball_speed_y = 0, 0
+    score = 0
+    start = False
+    player_speed = 0
+
+def game_over_screen():
+    global score, highscore, ball_speed_x, ball_speed_y, start
+
+    if score > highscore:
+        highscore = score
+
+    ball_speed_x, ball_speed_y = 0, 0
+
+    overlay = pygame.Surface((345, 200))
+    overlay.fill(pygame.Color("grey25"))
+    overlay_rect = overlay.get_rect(center=(screen_width / 2, screen_height / 2))
+    screen.blit(overlay, overlay_rect)
+
+    font = pygame.font.Font("freesansbold.ttf", 28)
+    text1 = font.render("Game Over", True, pygame.Color("firebrick4"))
+    text2 = font.render(f"Highscore: {highscore}", True, pygame.Color("white"))
+    text3 = font.render(f"Score: {score}", True, pygame.Color("white"))
+    text4 = font.render("Press SPACE to Restart", True, pygame.Color("yellow"))
+
+    screen.blit(text1, (overlay_rect.centerx - text1.get_width() / 2, overlay_rect.top + 20))
+    screen.blit(text2, (overlay_rect.centerx - text2.get_width()/2, overlay_rect.top + 63))
+    screen.blit(text3, (overlay_rect.centerx - text3.get_width()/2, overlay_rect.top + 105))
+    screen.blit(text4, (overlay_rect.centerx - text4.get_width()/2, overlay_rect.top + 150))
+
+    pygame.display.flip()
+
+    waiting = True
+    while waiting:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    restart()
+                    waiting = False
 
 # General setup
 pygame.mixer.pre_init(44100, -16, 1, 1024)
