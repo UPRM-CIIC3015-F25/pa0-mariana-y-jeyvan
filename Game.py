@@ -5,11 +5,16 @@ sound = pygame.mixer.Sound("BOOM sound effect (1).mp3")
 
 highscore = 0
 
+last_speed_increase = 0
+
+show_speed_text = 0
+show_speed_text2 = 0
+
 def ball_movement():
     """
     Handles the movement of the ball and collision detection with the player and screen boundaries.
     """
-    global ball_speed_x, ball_speed_y, score, start
+    global ball_speed_x, ball_speed_y, score, start, show_speed_text
 
     # Move the ball
     ball.x += ball_speed_x
@@ -24,14 +29,13 @@ def ball_movement():
         start = False
 
     # Ball collision with the player paddle
-    if ball.colliderect(player):
-        if abs(ball.bottom - player.top) < 10:  # Check if ball hits the top of the paddle
+    if ball.colliderect(player) and ball_speed_y > 0:
             # TODO Task 2: Fix score to increase by 1
             score += 1  # Increase player score
             ball_speed_y *= -1  # Reverse ball's vertical direction
             ball.bottom = player.top
             # TODO Task 6: Add sound effects HERE
-        sound.play()
+            sound.play()
 
     # Ball collision with top boundary
     if ball.top <= 0:
@@ -49,7 +53,31 @@ def ball_movement():
 
     # Ball goes below the bottom boundary (missed by player)
     if ball.bottom > screen_height:
-        game_over_screen()  # Reset the game
+        game_over_screen() # Reset the game
+
+    if difficulty():
+        show_speed_text = 60
+        show_speed_text2 = 100
+
+def difficulty():
+    global ball_speed_x, ball_speed_y, score, last_speed_increase
+
+    if score != 0 and score % 10 == 0 and score < 99 and score != last_speed_increase:
+        ball_speed_x *= 1.1
+        ball_speed_y *= 1.1
+        last_speed_increase = score
+        return True
+    return False
+
+    if score != 0 and score == 100:
+        ball_speed_x *= 1.1
+        ball_speed_y *= 1.1
+        return True
+    return False
+
+    if score > 101:
+        ball_speed_x *= 1
+        ball_speed_y *= 1
 
 def player_movement():
     """
@@ -70,6 +98,9 @@ def restart():
     score = 0
     start = False
     player_speed = 0
+
+    player.centerx = screen_width / 2
+    pygame.event.clear()
 
 def game_over_screen():
     global score, highscore, ball_speed_x, ball_speed_y, start
@@ -127,7 +158,8 @@ ball = pygame.Rect(screen_width / 2 - 15, screen_height / 2 - 15, 30, 30)  # Bal
 # TODO Task 1 Make the paddle bigger
 player_height = 15
 player_width = 200
-player = pygame.Rect(screen_width/2 - 45, screen_height - 20, player_width, player_height)  # Player paddle
+player = pygame.Rect(screen_width/2 - 45, screen_height - 20, player_width, player_height) # Player paddle
+player.centerx = (screen_width / 2)
 
 # Game Variables
 ball_speed_x = 0
@@ -174,7 +206,19 @@ while True:
     # TODO Task 3: Change the Ball Color
     pygame.draw.ellipse(screen, fire, ball)  # Draw ball
     player_text = basic_font.render(f'{score}', False, light_grey)  # Render player score
-    screen.blit(player_text, (screen_width/2 - 15, 10))  # Display score on screen
+    screen.blit(player_text, (screen_width/2 - player_text.get_width() / 2, 10))  # Display score on screen
+
+    if show_speed_text > 0 and show_speed_text <= 90:
+        font = pygame.font.Font('freesansbold.ttf', 24)
+        text_increased = font.render("Speed Increased", True, pygame.Color('gold'))
+        screen.blit(text_increased, (screen_width/2 - text_increased.get_width()/2, 50))
+        show_speed_text -= 1
+
+    if score == 100:
+        font = pygame.font.Font('freesansbold.ttf', 24)
+        text_increased = font.render("Max Speed", True, pygame.Color('gold'))
+        screen.blit(text_increased, (screen_width/2 + 1 - text_increased.get_width()/2, 50))
+        show_speed_text -= 1
 
     # Update display
     pygame.display.flip()
