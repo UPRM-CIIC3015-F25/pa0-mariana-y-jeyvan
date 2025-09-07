@@ -2,6 +2,7 @@ import pygame, sys, random
 
 pygame.mixer.init()
 sound = pygame.mixer.Sound("BOOM sound effect (1).mp3")
+sound67 = pygame.mixer.Sound("ssvid.net--doot-doot-6-7-skrilla-shorts.mp3")
 
 highscore = 0
 
@@ -31,11 +32,24 @@ def ball_movement():
     # Ball collision with the player paddle
     if ball.colliderect(player) and ball_speed_y > 0:
             # TODO Task 2: Fix score to increase by 1
-            score += 1  # Increase player score
-            ball_speed_y *= -1  # Reverse ball's vertical direction
-            ball.bottom = player.top
-            # TODO Task 6: Add sound effects HERE
+        ball_speed_y *= -1  # Reverse ball's vertical direction
+        ball.bottom = player.top
+
+        if score <= 55:
+            score += 1
             sound.play()
+
+        elif score == 56:
+            score += 1
+            sound67.play()
+
+        elif 57 <= score <= 67:
+            score += 1
+
+        else:
+            score += 1
+            sound.play()
+
 
     # Ball collision with top boundary
     if ball.top <= 0:
@@ -176,7 +190,9 @@ start = False  # Indicates if the game has started
 while True:
     # Event handling
     # TODO Task 4: Add your name
-    name = "John Doe"
+
+    name = "Jeyvan"
+    name2 = "Mariana"
     for event in pygame.event.get():
         if event.type == pygame.QUIT:  # Quit the game
             pygame.quit()
