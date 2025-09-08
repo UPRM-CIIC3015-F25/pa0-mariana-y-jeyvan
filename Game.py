@@ -16,12 +16,13 @@ last_speed_increase = 0
 
 show_speed_text = 0
 show_speed_text2 = 0
+level = 0
 
 def ball_movement():
     """
     Handles the movement of the ball and collision detection with the player and screen boundaries.
     """
-    global ball_speed_x, ball_speed_y, score, start, show_speed_text
+    global ball_speed_x, ball_speed_y, score, start, show_speed_text, level
 
     # Move the ball
     ball.x += ball_speed_x
@@ -29,7 +30,7 @@ def ball_movement():
 
     # Start the ball movement when the game begins
     # TODO Task 5 Create a Merge Conflict
-    speed = 7
+    speed = 10
     if start and ball_speed_x == 0 and ball_speed_y == 0:
         ball_speed_x = speed * random.choice((1, -1))  # Randomize initial horizontal direction
         ball_speed_y = speed * random.choice((-1, -1))  # Randomize initial vertical direction
@@ -74,11 +75,13 @@ def ball_movement():
     # Ball goes below the bottom boundary (missed by player)
     if ball.bottom > screen_height:
         soundgameover.play()
+        level = 0
         game_over_screen() # Reset the game
 
     if difficulty():
         show_speed_text = 60
         show_speed_text2 = 100
+        level += 1
 
 def difficulty():
     global ball_speed_x, ball_speed_y, score, last_speed_increase
@@ -243,6 +246,50 @@ while True:
         screen.blit(text_increased, (screen_width/2 + 1 - text_increased.get_width()/2, 50))
         show_speed_text -= 1
 
-    # Update display
+    if level == 1:
+        font = pygame.font.Font('freesansbold.ttf', 25)
+        text_level1 = font.render("Level 1", True, pygame.Color('blue'))
+        screen.blit(text_level1, (15,10))
+    if level == 2:
+        font = pygame.font.Font('freesansbold.ttf', 25)
+        text_level2 = font.render("Level 2", True, pygame.Color('blue'))
+        screen.blit(text_level2, (15, 10))
+    if level == 3:
+       font = pygame.font.Font('freesansbold.ttf', 25)
+       text_level3 = font.render("Level 3", True, pygame.Color('blue'))
+       screen.blit(text_level3, (15, 10))
+    if level == 4:
+       font = pygame.font.Font('freesansbold.ttf', 25)
+       text_level4 = font.render("Level 4", True, pygame.Color('blue'))
+       screen.blit(text_level4, (15, 10))
+    if level == 5:
+       font = pygame.font.Font('freesansbold.ttf', 25)
+       text_level5 = font.render("Level 5", True, pygame.Color('blue'))
+       screen.blit(text_level5, (15, 10))
+    if level == 6:
+        font = pygame.font.Font('freesansbold.ttf', 25)
+        text_level6 = font.render("Level 6", True, pygame.Color('blue'))
+        screen.blit(text_level6, (15, 10))
+    if level == 7:
+        font = pygame.font.Font('freesansbold.ttf', 25)
+        text_level7 = font.render("Level 7", True, pygame.Color('blue'))
+        screen.blit(text_level7, (15, 10))
+    if level == 8:
+        font = pygame.font.Font('freesansbold.ttf', 25)
+        text_level8 = font.render("Level 8", True, pygame.Color('blue'))
+        screen.blit(text_level8, (15, 10))
+    if level == 9:
+            font = pygame.font.Font('freesansbold.ttf', 25)
+            text_level9 = font.render("Level 9", True, pygame.Color('blue'))
+            screen.blit(text_level9, (15, 10))
+    if level >= 10:
+        font = pygame.font.Font('freesansbold.ttf', 25)
+        text_level10 = font.render("Level 10", True, pygame.Color('blue'))
+        screen.blit(text_level10, (15, 10))
+
+
+
+
+                    # Update display
     pygame.display.flip()
     clock.tick(60)  # Maintain 60 frames per second
