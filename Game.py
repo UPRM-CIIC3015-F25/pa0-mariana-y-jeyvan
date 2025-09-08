@@ -8,6 +8,7 @@ pygame.mixer.music.play()
 pygame.mixer.init()
 sound = pygame.mixer.Sound("BOOM sound effect (1).mp3")
 sound67 = pygame.mixer.Sound("ssvid.net--doot-doot-6-7-skrilla-shorts.mp3")
+soundgameover = pygame.mixer.Sound("gameover2.mp3")
 
 highscore = 0
 
@@ -72,6 +73,7 @@ def ball_movement():
 
     # Ball goes below the bottom boundary (missed by player)
     if ball.bottom > screen_height:
+        soundgameover.play()
         game_over_screen() # Reset the game
 
     if difficulty():
