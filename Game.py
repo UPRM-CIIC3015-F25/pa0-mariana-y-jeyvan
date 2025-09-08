@@ -59,6 +59,7 @@ def ball_movement():
     # Ball collision with the player paddle
     if ball.colliderect(player) and ball_speed_y > 0:
             # TODO Task 2: Fix score to increase by 1
+        score += 1
         ball_speed_y *= -1  # Reverse ball's vertical direction
         ball.bottom = player.top
         ball_speed_x += random.choice((-1, 1))
@@ -248,6 +249,8 @@ def shop_screen():
         text4_shop = font.render("3. Gold Ball - 75 coins", True, pygame.Color("gold"))
         text5_shop = font.render("4. Platinum Ball - 100 coins", True, pygame.Color("slategray3"))
         text6_shop = font.render("5. Diamond Ball - 150 coins", True, pygame.Color("paleturquoise3"))
+        text_escape = font.render("Press ESC to Exit", True, pygame.Color("yellow"))
+        coins_text = font.render(f'Coins: {coins}', True, pygame.Color("yellow"))
 
         screen.blit(text1_shop, (overlay_rect.centerx - text1_shop.get_width() / 2, overlay_rect.top + 20))
         screen.blit(text_select, (overlay_rect.centerx - text_select.get_width() / 2, overlay_rect.top + 60))
@@ -256,8 +259,8 @@ def shop_screen():
         screen.blit(text4_shop, (overlay_rect.centerx - text4_shop.get_width() / 2, overlay_rect.top + 190))
         screen.blit(text5_shop, (overlay_rect.centerx - text5_shop.get_width() / 2, overlay_rect.top + 235))
         screen.blit(text6_shop, (overlay_rect.centerx - text6_shop.get_width() / 2, overlay_rect.top + 280))
-        coins_text = font.render(f'Coins: {coins}', True, pygame.Color("yellow"))
         screen.blit(coins_text, (370, 10))
+        screen.blit(text_escape, (overlay_rect.centerx - text_escape.get_width() / 2, overlay_rect.top + 350))
 
         pygame.display.flip()
 
