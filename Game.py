@@ -5,7 +5,7 @@ bg_sound = pygame.mixer.music.load("ssvid.net---Castle-Infiltration.mp3")
 pygame.mixer.music.set_volume(0.2)
 pygame.mixer.music.play(-1)
 
-sound = pygame.mixer.Sound("BOOM sound effect (1).mp3")
+sound = pygame.mixer.Sound("pop.mp3")
 sound67 = pygame.mixer.Sound("ssvid.net--doot-doot-6-7-skrilla-shorts.mp3")
 sound_game_over = pygame.mixer.Sound("gameover2.mp3")
 
