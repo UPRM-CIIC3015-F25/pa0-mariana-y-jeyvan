@@ -1,6 +1,11 @@
 import pygame, sys, random
 
 pygame.mixer.init()
+bg_sound = pygame.mixer.music.load("ssvid.net---Castle-Infiltration.mp3")
+pygame.mixer.music.set_volume(0.2)
+pygame.mixer.music.play()
+
+pygame.mixer.init()
 sound = pygame.mixer.Sound("BOOM sound effect (1).mp3")
 sound67 = pygame.mixer.Sound("ssvid.net--doot-doot-6-7-skrilla-shorts.mp3")
 
@@ -23,7 +28,7 @@ def ball_movement():
 
     # Start the ball movement when the game begins
     # TODO Task 5 Create a Merge Conflict
-    speed = 10
+    speed = 7
     if start and ball_speed_x == 0 and ball_speed_y == 0:
         ball_speed_x = speed * random.choice((1, -1))  # Randomize initial horizontal direction
         ball_speed_y = speed * random.choice((-1, -1))  # Randomize initial vertical direction
