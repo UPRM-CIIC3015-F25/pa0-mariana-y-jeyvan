@@ -1,13 +1,12 @@
 import pygame, sys, random
 
 pygame.mixer.init()
-bg_sound = pygame.mixer.music.load("ssvid.net---Castle-Infiltration.mp3")
+pygame.mixer.music.load("Castle-Infiltration.mp3")
 pygame.mixer.music.set_volume(0.2)
 pygame.mixer.music.play(-1)
 
 sound = pygame.mixer.Sound("pop.mp3")
-sound67 = pygame.mixer.Sound("ssvid.net--doot-doot-6-7-skrilla-shorts.mp3")
-sound_game_over = pygame.mixer.Sound("gameover2.mp3")
+sound_game_over = pygame.mixer.Sound("game_over2.mp3")
 
 highscore = 0
 
@@ -42,7 +41,7 @@ def ball_movement():
     Handles the movement of the ball and collision detection with the player and screen boundaries.
     """
     global ball_speed_x, ball_speed_y, score, start, show_speed_text, show_speed_text2, \
-        level, coins, last_coins_increase, last_level_increase
+        level, coins, last_level_increase, last_coins_increase
 
     # Move the ball
     ball.x += ball_speed_x
@@ -62,7 +61,7 @@ def ball_movement():
         score += 1
         ball_speed_y *= -1  # Reverse ball's vertical direction
         ball.bottom = player.top
-        ball_speed_x += random.choice((-1, 1))
+        ball_speed_x += random.choice((-1, 0, 1))
         sound.play()
 
 
@@ -82,7 +81,6 @@ def ball_movement():
 
     # Ball goes below the bottom boundary (missed by player)
     if ball.bottom > screen_height:
-        level = 0
         pygame.mixer.music.stop()
         sound_game_over.play()
         game_over_screen() # Reset the game
@@ -110,17 +108,17 @@ def difficulty():
         ball_speed_y *= 1.1
         last_speed_increase = score
         return True
-    return False
 
-    if score != 0 and score == 100:
+    if score != 0 and score == 100 and score != last_speed_increase:
         ball_speed_x *= 1.1
         ball_speed_y *= 1.1
+        last_speed_increase = score
         return True
-    return False
 
-    if score > 101:
-        ball_speed_x *= 1
-        ball_speed_y *= 1
+    if score > 100:
+        return False
+
+    return False
 
 def player_movement():
     """
@@ -135,14 +133,20 @@ def player_movement():
         player.right = screen_width
 
 def restart():
-    global ball_speed_x, ball_speed_y, score, start, player_speed
-    ball.center = (screen_width / 2, screen_height / 2)
+    global ball_speed_x, ball_speed_y, score, start, player_speed, level, \
+        last_coins_increase, last_speed_increase, last_level_increase
+    ball.center = (screen_width // 2, screen_height // 2)
     ball_speed_x, ball_speed_y = 0, 0
     score = 0
     start = False
     player_speed = 0
 
-    player.centerx = screen_width / 2
+    level = 0
+    last_speed_increase = 0
+    last_coins_increase = 0
+    last_level_increase = 0
+
+    player.centerx = screen_width // 2
     pygame.event.clear()
 
 def game_over_screen():
@@ -158,12 +162,12 @@ def game_over_screen():
     overlay_rect = overlay.get_rect(center=(screen_width / 2, screen_height / 2))
     screen.blit(overlay, overlay_rect)
 
-    font = pygame.font.Font("freesansbold.ttf", 28)
-    text1 = font.render("Game Over", True, pygame.Color("firebrick4"))
-    text2 = font.render(f"Highscore: {highscore}", True, pygame.Color("white"))
-    text3 = font.render(f"Score: {score}", True, pygame.Color("white"))
-    text4 = font.render("Press SPACE to Restart", True, pygame.Color("yellow"))
-    text5 = font.render("Press S to Shop", True, pygame.Color("khaki"))
+    game_over_font = pygame.font.Font("freesansbold.ttf", 28)
+    text1 = game_over_font.render("Game Over", True, pygame.Color("firebrick4"))
+    text2 = game_over_font.render(f"Highscore: {highscore}", True, pygame.Color("white"))
+    text3 = game_over_font.render(f"Score: {score}", True, pygame.Color("white"))
+    text4 = game_over_font.render("Press SPACE to Restart", True, pygame.Color("yellow"))
+    text5 = game_over_font.render("Press S to Shop", True, pygame.Color("khaki"))
 
     screen.blit(text1, (overlay_rect.centerx - text1.get_width() / 2, overlay_rect.top + 20))
     screen.blit(text2, (overlay_rect.centerx - text2.get_width()/2, overlay_rect.top + 63))
@@ -175,16 +179,16 @@ def game_over_screen():
 
     waiting = True
     while waiting:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+        for event2 in pygame.event.get():
+            if event2.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
+            if event2.type == pygame.KEYDOWN:
+                if event2.key == pygame.K_SPACE:
                     restart()
                     pygame.mixer.music.play()
                     waiting = False
-                if event.key == pygame.K_s:
+                if event2.key == pygame.K_s:
                     shop_screen()
                     waiting = False
 
@@ -193,42 +197,42 @@ def shop_screen():
 
     running = True
     while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+        for event3 in pygame.event.get():
+            if event3.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
+            if event3.type == pygame.KEYDOWN:
+                if event3.key == pygame.K_ESCAPE:
                     running = False
-                if event.key == pygame.K_1:
+                if event3.key == pygame.K_1:
                     if not inventory["Bronze Ball"] and coins >= bronze:
                         coins -= bronze
                         selected_ball = "Bronze Ball"
                         inventory["Bronze Ball"] = True
                     if inventory["Bronze Ball"]:
                         selected_ball = "Bronze Ball"
-                if event.key == pygame.K_2:
+                if event3.key == pygame.K_2:
                     if not inventory["Silver Ball"] and coins >= silver:
                         coins -= silver
                         selected_ball = "Silver Ball"
                         inventory["Silver Ball"] = True
                     if inventory["Silver Ball"]:
                         selected_ball = "Silver Ball"
-                if event.key == pygame.K_3:
+                if event3.key == pygame.K_3:
                     if not inventory["Gold Ball"] and coins >= gold:
                         coins -= gold
                         selected_ball = "Gold Ball"
                         inventory["Gold Ball"] = True
                     if inventory["Gold Ball"]:
                         selected_ball = "Gold Ball"
-                if event.key == pygame.K_4:
+                if event3.key == pygame.K_4:
                     if not inventory["Platinum Ball"] and coins >= platinum:
                         coins -= platinum
                         selected_ball = "Platinum Ball"
                         inventory["Platinum Ball"] = True
                     if inventory["Platinum Ball"]:
                         selected_ball = "Platinum Ball"
-                if event.key == pygame.K_5:
+                if event3.key == pygame.K_5:
                     if not inventory["Diamond Ball"] and coins >= diamond:
                         coins -= diamond
                         selected_ball = "Diamond Ball"
@@ -241,26 +245,26 @@ def shop_screen():
         overlay_rect = overlay.get_rect(center=(screen_width / 2, screen_height / 2))
         screen.blit(overlay, overlay_rect)
 
-        font = pygame.font.Font("freesansbold.ttf", 28)
-        text1_shop = font.render("Shop", True, pygame.Color("white"))
-        text_select = font.render("Select Number", True, pygame.Color("khaki"))
-        text2_shop = font.render("1. Bronze Ball - 25 coins", True, pygame.Color("sienna"))
-        text3_shop = font.render("2. Silver Ball - 50 coins", True, pygame.Color("silver"))
-        text4_shop = font.render("3. Gold Ball - 75 coins", True, pygame.Color("gold"))
-        text5_shop = font.render("4. Platinum Ball - 100 coins", True, pygame.Color("slategray3"))
-        text6_shop = font.render("5. Diamond Ball - 150 coins", True, pygame.Color("paleturquoise3"))
-        text_escape = font.render("Press ESC to Exit", True, pygame.Color("yellow"))
-        coins_text = font.render(f'Coins: {coins}', True, pygame.Color("yellow"))
+        shop_screen_font = pygame.font.Font("freesansbold.ttf", 28)
+        text1_shop = shop_screen_font.render("Shop", True, pygame.Color("white"))
+        text_select = shop_screen_font.render("Select Number", True, pygame.Color("khaki"))
+        text2_shop = shop_screen_font.render("1. Bronze Ball - 25 coins", True, pygame.Color("sienna"))
+        text3_shop = shop_screen_font.render("2. Silver Ball - 50 coins", True, pygame.Color("silver"))
+        text4_shop = shop_screen_font.render("3. Gold Ball - 75 coins", True, pygame.Color("gold"))
+        text5_shop = shop_screen_font.render("4. Platinum Ball - 100 coins", True, pygame.Color("slategray1"))
+        text6_shop = shop_screen_font.render("5. Diamond Ball - 150 coins", True, pygame.Color("paleturquoise3"))
+        text_escape = shop_screen_font.render("Press ESC to Exit", True, pygame.Color("yellow"))
+        coins_text = shop_screen_font.render(f'Coins: {coins}', True, pygame.Color("yellow"))
 
         screen.blit(text1_shop, (overlay_rect.centerx - text1_shop.get_width() / 2, overlay_rect.top + 20))
-        screen.blit(text_select, (overlay_rect.centerx - text_select.get_width() / 2, overlay_rect.top + 60))
-        screen.blit(text2_shop, (overlay_rect.centerx - text2_shop.get_width() / 2, overlay_rect.top + 100))
-        screen.blit(text3_shop, (overlay_rect.centerx - text3_shop.get_width() / 2, overlay_rect.top + 145))
-        screen.blit(text4_shop, (overlay_rect.centerx - text4_shop.get_width() / 2, overlay_rect.top + 190))
-        screen.blit(text5_shop, (overlay_rect.centerx - text5_shop.get_width() / 2, overlay_rect.top + 235))
-        screen.blit(text6_shop, (overlay_rect.centerx - text6_shop.get_width() / 2, overlay_rect.top + 280))
+        screen.blit(text_select, (overlay_rect.centerx - text_select.get_width() / 2, overlay_rect.top + 65))
+        screen.blit(text2_shop, (overlay_rect.centerx - text2_shop.get_width() / 2, overlay_rect.top + 120))
+        screen.blit(text3_shop, (overlay_rect.centerx - text3_shop.get_width() / 2, overlay_rect.top + 165))
+        screen.blit(text4_shop, (overlay_rect.centerx - text4_shop.get_width() / 2, overlay_rect.top + 210))
+        screen.blit(text5_shop, (overlay_rect.centerx - text5_shop.get_width() / 2, overlay_rect.top + 255))
+        screen.blit(text6_shop, (overlay_rect.centerx - text6_shop.get_width() / 2, overlay_rect.top + 300))
         screen.blit(coins_text, (370, 10))
-        screen.blit(text_escape, (overlay_rect.centerx - text_escape.get_width() / 2, overlay_rect.top + 350))
+        screen.blit(text_escape, (overlay_rect.centerx - text_escape.get_width() / 2, overlay_rect.top + 370))
 
         pygame.display.flip()
 
@@ -284,7 +288,6 @@ ball = pygame.Rect(screen_width / 2 - 15, screen_height / 2 - 15, 30, 30)  # Bal
 player_height = 15
 player_width = 200
 player = pygame.Rect(screen_width/2 - 45, screen_height - 20, player_width, player_height) # Player paddle
-player.centerx = (screen_width / 2)
 
 # Game Variables
 ball_speed_x = 0
@@ -347,7 +350,7 @@ while True:
         pygame.draw.ellipse(screen, pygame.Color('gold'), ball)
 
     if selected_ball == "Platinum Ball":
-        pygame.draw.ellipse(screen, pygame.Color('slategray3'), ball)
+        pygame.draw.ellipse(screen, pygame.Color('slategray1'), ball)
 
     if selected_ball == "Diamond Ball":
         pygame.draw.ellipse(screen, pygame.Color('paleturquoise3'), ball)
@@ -359,7 +362,7 @@ while True:
     coins_text = font.render(f'Coins: {coins}', True, pygame.Color("yellow"))
     screen.blit(coins_text, (370, 10))
 
-    if show_speed_text > 0 and show_speed_text <= 90:
+    if 0 < show_speed_text <= 90:
         font = pygame.font.Font('freesansbold.ttf', 24)
         text_increased = font.render("Speed Increased", True, pygame.Color('gold'))
         screen.blit(text_increased, (screen_width/2 - text_increased.get_width()/2, 50))
@@ -415,8 +418,6 @@ while True:
         font = pygame.font.Font('freesansbold.ttf', 24)
         text_level10 = font.render("Level 10", True, pygame.Color('blue'))
         screen.blit(text_level10, (15, 10))
-
-
 
                     # Update display
     pygame.display.flip()
